@@ -7,7 +7,7 @@
          <SolidColorBrush x:Key="GridBackgroundColor">#312C40</SolidColorBrush>
          <SolidColorBrush x:Key="GridLineColor">#4F4867</SolidColorBrush>
         <SolidColorBrush x:Key="TextColor">#EBEBEB</SolidColorBrush>
-        <SolidColorBrush x:Key="OverlatColor">#7F000000</SolidColorBrush>
+        <SolidColorBrush x:Key="OverlayColor">#7F000000</SolidColorBrush>
         <FontFamily x:Key="MainFont">Assets/#Droid Sans Mongo</FontFamily>
     </Application.Resources>
 </Application>
