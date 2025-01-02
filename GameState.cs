@@ -9,6 +9,7 @@ public class GameState
     public int Score { get; private set; }
     public bool GameOver { get; private set; }
 
+    private Position FoodPosition { get; set; }
     private readonly LinkedList<Direction> directionChanges = [];
     private readonly LinkedList<Position> _snakePositions = [];
     private readonly Random _random = new();
@@ -57,6 +58,7 @@ public class GameState
         }
 
         var pos = empty[_random.Next(empty.Count)];
+        FoodPosition = pos;
         Grid[pos.Row, pos.Column] = GridValue.Food;
     }
 
@@ -139,13 +141,17 @@ public class GameState
             SnakeDirection = directionChanges.First.Value;
             directionChanges.RemoveFirst();
         }
-        
-        var newHeadPos = HeadPosition().Translate(SnakeDirection);
+
+        var previousHeadPosition = HeadPosition();
+        var newHeadPos = previousHeadPosition.Translate(SnakeDirection);
         var hit = WillHit(newHeadPos);
         
         switch (hit)
         {
-            case GridValue.Snake or GridValue.Outside:
+            case GridValue.Outside:
+                HandleBoundaryHit(previousHeadPosition);
+                break;
+            case GridValue.Snake:
                 GameOver = true;
                 break;
             case GridValue.Empty:
@@ -158,5 +164,26 @@ public class GameState
                 AddFood();
                 break;
         }
+    }
+    
+    private void HandleBoundaryHit(Position previousHeadPosition)
+    {
+        var newHeadPos = SnakeDirection switch
+        {
+            { RowOffset: -1, ColumnOffset: 0 } => new Position(Rows - 1, previousHeadPosition.Column),
+            { RowOffset: 0, ColumnOffset: 1 } => new Position(previousHeadPosition.Row, 0),
+            { RowOffset: 1, ColumnOffset: 0 } => new Position(0, previousHeadPosition.Column),
+            { RowOffset: 0, ColumnOffset: -1 } => new Position(previousHeadPosition.Row, Columns - 1),
+            _ => previousHeadPosition
+        };
+
+        if (newHeadPos == FoodPosition)
+        {
+            Score++;
+            AddFood();
+        }
+
+        RemoveTail();
+        AddHead(newHeadPos);
     }
 }
