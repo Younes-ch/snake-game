@@ -23,8 +23,8 @@ public partial class MainWindow : Window
         { GridValue.Food, Images.Food },
     };
 
-    private const int Rows = 30;
-    private const int Cols = 30;
+    private const int Rows = 15;
+    private const int Cols = 15;
     private readonly Image[,] gridImages;
     private GameState _gameState;
     
@@ -67,6 +67,7 @@ public partial class MainWindow : Window
     private void Draw()
     {
         DrawGrid();
+        ScoreText.Text = $"SCORE: {_gameState.Score}";
     }
 
     private void DrawGrid()
@@ -81,6 +82,16 @@ public partial class MainWindow : Window
         }   
     }
 
+    private async Task GameLoop()
+    {
+        while (!_gameState.GameOver)
+        {
+            await Task.Delay(100);
+            _gameState.Move();
+            Draw();
+        }
+    }
+    
     private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
         if (_gameState.GameOver) return;
@@ -102,13 +113,4 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task GameLoop()
-    {
-        while (!_gameState.GameOver)
-        {
-            await Task.Delay(100);
-            _gameState.Move();
-            Draw();
-        }
-    }
 }
