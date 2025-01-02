@@ -49,6 +49,7 @@ public partial class MainWindow : Window
         var images = new Image[Rows, Cols];
         GameGrid.Rows = Rows;
         GameGrid.Columns = Cols;
+        GameGrid.Width = GameGrid.Height * (Cols / (double)Rows);
 
         for (var r = 0; r < Rows; r++)
         {
