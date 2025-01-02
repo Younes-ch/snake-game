@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private const int Cols = 15;
     private readonly Image[,] gridImages;
     private GameState _gameState;
+    private bool gameRunning;
     
     public MainWindow()
     {
@@ -58,10 +59,26 @@ public partial class MainWindow : Window
         return images;
     }
     
-    private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    private async Task RunGame()
     {
         Draw();
+        await ShowCountDown();
+        Overlay.Visibility = Visibility.Hidden;
         await GameLoop();
+        await ShowGameOver();
+        _gameState = new GameState(Rows, Cols);
+    }
+    
+    private async void MainWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (Overlay.IsVisible) e.Handled = true;
+
+        if (!gameRunning)
+        {
+            gameRunning = true;
+            await RunGame();
+            gameRunning = false;
+        }
     }
     
     private void Draw()
@@ -113,4 +130,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private async Task ShowCountDown()
+    {
+        for (var i = 3; i >= 1; i--)
+        {
+            OverylayText.Text = i.ToString();
+            await Task.Delay(500);
+        }
+    }
+
+    private async Task ShowGameOver()
+    {
+        await Task.Delay(1000);
+        OverylayText.Text = "PRESS ANY KEY TO START";
+        Overlay.Visibility = Visibility.Visible;
+    }
 }

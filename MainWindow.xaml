@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SnakeGame"
         mc:Ignorable="d"
         Title="Snake" Height="500" Width="800"
         MinWidth="300" MinHeight="300"
@@ -12,7 +11,7 @@
         FontFamily="{StaticResource MainFont}"
         WindowStartupLocation="CenterScreen"
         Icon="Assets/icon.ico"
-        Loaded="MainWindow_OnLoaded"
+        PreviewKeyDown="MainWindow_OnPreviewKeyDown"
         KeyDown="MainWindow_OnKeyDown">
     <Viewbox>
         <Grid>
@@ -44,7 +43,20 @@
                              SnapsToDevicePixels="True"
                              RenderOptions.BitmapScalingMode="HighQuality">
                 </UniformGrid>
-            
+            </Border>
+            <Border x:Name="Overlay"
+                    Grid.Row="1"
+                    Background="{StaticResource OverlayColor}"
+                    Width="{Binding Path=ActualWidth, ElementName=GridBorder}"
+                    Height="{Binding Path=ActualWidth, ElementName=GridBorder}"
+                    Margin="{Binding Path=Margin, ElementName=GridBorder}"
+                    RenderOptions.EdgeMode="Aliased">
+                <TextBlock x:Name="OverylayText"
+                           Text="PRESS ANY KEY TO START"
+                           FontSize="26"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"></TextBlock>
             </Border>
         </Grid>
     </Viewbox>
