@@ -2,6 +2,21 @@
 
 public class GameState
 {
+    private readonly Random _random = new();
+    private readonly LinkedList<Position> _snakePositions = [];
+    private readonly LinkedList<Direction> directionChanges = [];
+
+    public GameState(int rows, int columns)
+    {
+        Rows = rows;
+        Columns = columns;
+        Grid = new GridValue[Rows, Columns];
+        SnakeDirection = Direction.Right;
+
+        AddSnake();
+        AddFood();
+    }
+
     public int Rows { get; set; }
     public int Columns { get; set; }
     public GridValue[,] Grid { get; set; }
@@ -10,20 +25,6 @@ public class GameState
     public bool GameOver { get; private set; }
 
     private Position FoodPosition { get; set; }
-    private readonly LinkedList<Direction> directionChanges = [];
-    private readonly LinkedList<Position> _snakePositions = [];
-    private readonly Random _random = new();
-
-    public GameState(int rows, int columns)
-    {
-        Rows = rows;
-        Columns = columns;
-        Grid = new GridValue[Rows, Columns];
-        SnakeDirection = Direction.Right;
-        
-        AddSnake();
-        AddFood();
-    }
 
     private void AddSnake()
     {
@@ -37,25 +38,17 @@ public class GameState
 
     private IEnumerable<Position> EmptyPositions()
     {
-        for (int r = 0; r < Rows; r++)
-        {
-            for (int c = 0; c < Columns; c++)
-            {
-                if (Grid[r, c] == GridValue.Empty)
-                {
-                    yield return new Position(r, c);
-                }
-            }
-        }
+        for (var r = 0; r < Rows; r++)
+        for (var c = 0; c < Columns; c++)
+            if (Grid[r, c] == GridValue.Empty)
+                yield return new Position(r, c);
     }
+
     private void AddFood()
     {
         var empty = new List<Position>(EmptyPositions());
 
-        if (empty.Count == 0)
-        {
-            return;
-        }
+        if (empty.Count == 0) return;
 
         var pos = empty[_random.Next(empty.Count)];
         FoodPosition = pos;
@@ -92,10 +85,7 @@ public class GameState
 
     public void ChangeDirection(Direction dir)
     {
-        if (CanChangeDirection(dir))
-        {
-            directionChanges.AddLast(dir);
-        }
+        if (CanChangeDirection(dir)) directionChanges.AddLast(dir);
     }
 
     private bool CanChangeDirection(Direction newDirection)
@@ -105,7 +95,7 @@ public class GameState
         var lastDirection = GetLastDirection();
         return newDirection != lastDirection && newDirection != lastDirection.Opposite();
     }
-    
+
     private Direction GetLastDirection()
     {
         if (directionChanges.Count == 0)
@@ -121,16 +111,10 @@ public class GameState
 
     private GridValue WillHit(Position newHeadPosition)
     {
-        if (OutsideGrid(newHeadPosition))
-        {
-            return GridValue.Outside;
-        }
+        if (OutsideGrid(newHeadPosition)) return GridValue.Outside;
 
-        if (newHeadPosition == TailPosition())
-        {
-            return GridValue.Empty;
-        }
-        
+        if (newHeadPosition == TailPosition()) return GridValue.Empty;
+
         return Grid[newHeadPosition.Row, newHeadPosition.Column];
     }
 
@@ -145,7 +129,7 @@ public class GameState
         var previousHeadPosition = HeadPosition();
         var newHeadPos = previousHeadPosition.Translate(SnakeDirection);
         var hit = WillHit(newHeadPos);
-        
+
         switch (hit)
         {
             case GridValue.Outside:
@@ -165,7 +149,7 @@ public class GameState
                 break;
         }
     }
-    
+
     private void HandleBoundaryHit(Position previousHeadPosition)
     {
         var newHeadPos = SnakeDirection switch

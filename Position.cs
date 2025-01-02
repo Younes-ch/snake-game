@@ -1,15 +1,9 @@
 ﻿namespace SnakeGame;
 
-public class Position
+public class Position(int row, int column)
 {
-    public int Row { get; set; }
-    public int Column { get; set; }
-
-    public Position(int row, int column)
-    {
-        Row = row;
-        Column = column;
-    }
+    public int Row { get; set; } = row;
+    public int Column { get; set; } = column;
 
     public Position Translate(Direction dir)
     {
@@ -20,12 +14,12 @@ public class Position
     {
         return HashCode.Combine(Row, Column);
     }
-    
+
     public override bool Equals(object? obj)
     {
         return obj is Position pos
-            && Row == pos.Row
-            && Column == pos.Column;
+               && Row == pos.Row
+               && Column == pos.Column;
     }
 
     public static bool operator ==(Position left, Position right)

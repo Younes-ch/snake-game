@@ -1,39 +1,35 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SnakeGame;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+///     Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly Dictionary<GridValue, ImageSource> gridValToImage = new()
-    {
-        { GridValue.Empty, Images.Empty },
-        { GridValue.Snake, Images.Body },
-        { GridValue.Food, Images.Food },
-    };
+    private const int Rows = 15;
+    private const int Cols = 15;
 
     private readonly Dictionary<Direction, int> dirToRotation = new()
     {
         { Direction.Up, 0 },
         { Direction.Right, 90 },
         { Direction.Down, 180 },
-        { Direction.Left, 270 },
+        { Direction.Left, 270 }
     };
 
-    private const int Rows = 15;
-    private const int Cols = 15;
     private readonly Image[,] gridImages;
+
+    private readonly Dictionary<GridValue, ImageSource> gridValToImage = new()
+    {
+        { GridValue.Empty, Images.Empty },
+        { GridValue.Snake, Images.Body },
+        { GridValue.Food, Images.Food }
+    };
+
     private GameState _gameState;
     private bool gameRunning;
 
@@ -52,18 +48,16 @@ public partial class MainWindow : Window
         GameGrid.Width = GameGrid.Height * (Cols / (double)Rows);
 
         for (var r = 0; r < Rows; r++)
+        for (var c = 0; c < Cols; c++)
         {
-            for (var c = 0; c < Cols; c++)
+            var image = new Image
             {
-                var image = new Image
-                {
-                    Source = Images.Empty,
-                    RenderTransformOrigin = new Point(0.5, 0.5)
-                };
+                Source = Images.Empty,
+                RenderTransformOrigin = new Point(0.5, 0.5)
+            };
 
-                images[r, c] = image;
-                GameGrid.Children.Add(image);
-            }
+            images[r, c] = image;
+            GameGrid.Children.Add(image);
         }
 
         return images;
@@ -101,13 +95,11 @@ public partial class MainWindow : Window
     private void DrawGrid()
     {
         for (var r = 0; r < Rows; r++)
+        for (var c = 0; c < Cols; c++)
         {
-            for (var c = 0; c < Cols; c++)
-            {
-                var gridValue = _gameState.Grid[r, c];
-                gridImages[r, c].Source = gridValToImage[gridValue];
-                gridImages[r, c].RenderTransform = Transform.Identity;
-            }
+            var gridValue = _gameState.Grid[r, c];
+            gridImages[r, c].Source = gridValToImage[gridValue];
+            gridImages[r, c].RenderTransform = Transform.Identity;
         }
     }
 
@@ -125,10 +117,10 @@ public partial class MainWindow : Window
     {
         var positions = new List<Position>(_gameState.SnakePositions());
 
-        for (int i = 0; i < positions.Count; i++)
+        for (var i = 0; i < positions.Count; i++)
         {
             var position = positions[i];
-            var source = (i == 0) ? Images.DeadHead : Images.DeadBody;
+            var source = i == 0 ? Images.DeadHead : Images.DeadBody;
             gridImages[position.Row, position.Column].Source = source;
             await Task.Delay(50);
         }
