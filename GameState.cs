@@ -117,20 +117,20 @@ public class GameState
         var newHeadPos = HeadPosition().Translate(SnakeDirection);
         var hit = WillHit(newHeadPos);
         
-        if (hit is GridValue.Snake or GridValue.Outside)
+        switch (hit)
         {
-            GameOver = true;
-        } 
-        else if (hit == GridValue.Empty)
-        {
-            RemoveTail();
-            AddHead(newHeadPos);
-        }
-        else if (hit == GridValue.Food)
-        {
-            AddHead(newHeadPos);
-            Score++;
-            AddFood();
+            case GridValue.Snake or GridValue.Outside:
+                GameOver = true;
+                break;
+            case GridValue.Empty:
+                RemoveTail();
+                AddHead(newHeadPos);
+                break;
+            case GridValue.Food:
+                AddHead(newHeadPos);
+                Score++;
+                AddFood();
+                break;
         }
     }
 }

@@ -22,8 +22,9 @@ public partial class MainWindow : Window
         { GridValue.Snake, Images.Body },
         { GridValue.Food, Images.Food },
     };
-    
-    private readonly int _rows = 15, _cols = 15;
+
+    private const int Rows = 30;
+    private const int Cols = 30;
     private readonly Image[,] gridImages;
     private GameState _gameState;
     
@@ -31,18 +32,18 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         gridImages = SetupGrid();
-        _gameState = new GameState(_rows, _cols);
+        _gameState = new GameState(Rows, Cols);
     }
 
     private Image[,] SetupGrid()
     {
-        var images = new Image[_rows, _cols];
-        GameGrid.Rows = _rows;
-        GameGrid.Columns = _cols;
+        var images = new Image[Rows, Cols];
+        GameGrid.Rows = Rows;
+        GameGrid.Columns = Cols;
 
-        for (var r = 0; r < _rows; r++)
+        for (var r = 0; r < Rows; r++)
         {
-            for (var c = 0; c < _cols; c++)
+            for (var c = 0; c < Cols; c++)
             {
                 var image = new Image
                 {
@@ -57,9 +58,10 @@ public partial class MainWindow : Window
         return images;
     }
     
-    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         Draw();
+        await GameLoop();
     }
     
     private void Draw()
@@ -69,13 +71,44 @@ public partial class MainWindow : Window
 
     private void DrawGrid()
     {
-        for (var r = 0; r < _rows; r++)
+        for (var r = 0; r < Rows; r++)
         {
-            for (var c = 0; c < _cols; c++)
+            for (var c = 0; c < Cols; c++)
             {
                 var gridValue = _gameState.Grid[r, c];
                 gridImages[r, c].Source = gridValToImage[gridValue];
             }
         }   
+    }
+
+    private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (_gameState.GameOver) return;
+
+        switch (e.Key)
+        {
+            case Key.Left:
+                _gameState.ChangeDirection(Direction.Left);
+                break;
+            case Key.Right:
+                _gameState.ChangeDirection(Direction.Right);
+                break;
+            case Key.Up:
+                _gameState.ChangeDirection(Direction.Up);
+                break;
+            case Key.Down:
+                _gameState.ChangeDirection(Direction.Down);
+                break;
+        }
+    }
+
+    private async Task GameLoop()
+    {
+        while (!_gameState.GameOver)
+        {
+            await Task.Delay(100);
+            _gameState.Move();
+            Draw();
+        }
     }
 }

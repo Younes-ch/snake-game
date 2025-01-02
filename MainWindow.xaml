@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SnakeGame"
         mc:Ignorable="d"
-        Title="Snake" Height="500" Width="800"
+        Title="Snake" Height="600" Width="800"
         Background="{StaticResource BackgroundColor}"
         Foreground="{StaticResource TextColor}"
         FontFamily="{StaticResource MainFont}"
         WindowStartupLocation="CenterScreen"
         Icon="Assets/icon.ico"
         Loaded="MainWindow_OnLoaded"
+        KeyDown="MainWindow_OnKeyDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
