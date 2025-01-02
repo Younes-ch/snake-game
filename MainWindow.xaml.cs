@@ -23,12 +23,20 @@ public partial class MainWindow : Window
         { GridValue.Food, Images.Food },
     };
 
+    private readonly Dictionary<Direction, int> dirToRotation = new()
+    {
+        { Direction.Up, 0 },
+        { Direction.Right, 90 },
+        { Direction.Down, 180 },
+        { Direction.Left, 270 },
+    };
+
     private const int Rows = 15;
     private const int Cols = 15;
     private readonly Image[,] gridImages;
     private GameState _gameState;
     private bool gameRunning;
-    
+
     public MainWindow()
     {
         InitializeComponent();
@@ -48,7 +56,8 @@ public partial class MainWindow : Window
             {
                 var image = new Image
                 {
-                    Source = Images.Empty
+                    Source = Images.Empty,
+                    RenderTransformOrigin = new Point(0.5, 0.5)
                 };
 
                 images[r, c] = image;
@@ -58,7 +67,7 @@ public partial class MainWindow : Window
 
         return images;
     }
-    
+
     private async Task RunGame()
     {
         Draw();
@@ -68,7 +77,7 @@ public partial class MainWindow : Window
         await ShowGameOver();
         _gameState = new GameState(Rows, Cols);
     }
-    
+
     private async void MainWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (Overlay.IsVisible) e.Handled = true;
@@ -80,10 +89,11 @@ public partial class MainWindow : Window
             gameRunning = false;
         }
     }
-    
+
     private void Draw()
     {
         DrawGrid();
+        DrawSnakeHead();
         ScoreText.Text = $"SCORE: {_gameState.Score}";
     }
 
@@ -95,8 +105,19 @@ public partial class MainWindow : Window
             {
                 var gridValue = _gameState.Grid[r, c];
                 gridImages[r, c].Source = gridValToImage[gridValue];
+                gridImages[r, c].RenderTransform = Transform.Identity;
             }
-        }   
+        }
+    }
+
+    private void DrawSnakeHead()
+    {
+        var headPosition = _gameState.HeadPosition();
+        var image = gridImages[headPosition.Row, headPosition.Column];
+        image.Source = Images.Head;
+
+        var rotation = dirToRotation[_gameState.SnakeDirection];
+        image.RenderTransform = new RotateTransform(rotation);
     }
 
     private async Task GameLoop()
@@ -108,7 +129,7 @@ public partial class MainWindow : Window
             Draw();
         }
     }
-    
+
     private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
         if (_gameState.GameOver) return;
